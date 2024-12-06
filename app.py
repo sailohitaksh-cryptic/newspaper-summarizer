@@ -33,13 +33,18 @@ if st.button("Get News"):
         soup = BeautifulSoup(response.content, "html.parser")
         elements = soup.find_all(class_="uwU81")
 
+        BASE_URL = "https://timesofindia.indiatimes.com"
+
+        # Extract text and links from these elements
         scraped_data = []
-        for element in elements[:5]:
+        for element in elements_with_uwU81[:5]:
             text = element.get_text(strip=True)
-            link_tag = element.find("a")
-            link = f"https://timesofindia.indiatimes.com{link_tag['href']}" if link_tag else None
+            link = element.find('a')['href'] if element.find('a') else None
             if link:
-                scraped_data.append({"text": text, "link": link})
+                # Check if the link is already an absolute URL or needs the base URL
+                full_link = link if link.startswith("http") else BASE_URL + link
+                # Store for further scraping
+                scraped_data.append({'text': text, 'link': full_link})
 
         for item in scraped_data:
             try:
